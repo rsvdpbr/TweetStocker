@@ -32,6 +32,17 @@ App::uses('Model', 'Model');
  */
 class AppModel extends Model {
 
+	/* トランザクション */
+	public function begin() {
+		return $this->getDataSource()->begin();
+	}
+	public function commit() {
+		return $this->getDataSource()->commit();
+	}
+	public function rollback() {
+		return $this->getDataSource()->rollback();
+	}
+	
 	/* Datetime型の文字列を生成 */
 	protected function getDatetime($time = null){
 		if($time){
