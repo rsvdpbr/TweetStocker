@@ -31,4 +31,21 @@ App::uses('Model', 'Model');
  * @package       app.Model
  */
 class AppModel extends Model {
+
+	/* Datetime型の文字列を生成 */
+	protected function getDatetime($time = null){
+		if($time){
+			return date("Y-m-d H:i:s", $time);
+		}else{
+			return date("Y-m-d H:i:s");
+		}
+	}
+
+	/* プリミティブでない値のエンコード・デコード関数 */
+	protected function encodeValue($data){
+		return base64_encode(gzdeflate(serialize($data), 9));
+	}
+	protected function decodeValue($data){
+		return unserialize(gzinflate(base64_decode($data)));
+	}
 }

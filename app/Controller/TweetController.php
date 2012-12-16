@@ -2,6 +2,8 @@
 
 class TweetController extends AppController {
 
+	public $uses = array('Tweet', 'Hashtag', 'User');
+
 	private $twitter = null;
 	private $consumer_key = null;
 	private $consumer_secret = null;
@@ -51,21 +53,60 @@ class TweetController extends AppController {
 	/* ツイッターAPIを用いて、キーワードで検索を行う */
 	private function twitterSearch($param){
 		/* 各項目の設定 */
+		if(!isset($param['q'])){
+			throw new InvalidArgumentException('the first argument must have q(uery) key');
+		}
 		$this->initTwitterOAuth();
 		$url = 'https://api.twitter.com/1.1/search/tweets.json';
 		$obj = array(
-			'q' => $param['query'],
 			'result_type' => 'recent',
 			'include_entities' => '1',
 			'count' => '100',
 		);
-		if(isset($param['max_id'])) $obj['max_id'] = $param['max_id'];
-		if(isset($param['since_id'])) $obj['since_id'] = $param['since_id'];
+		$obj = array_merge($obj, $param);
 		/* 取得整形 */
 		$result = $this->twitter->OAuthRequest($url, 'GET', $obj);
 		$result = json_decode($result);
 		$result = $this->recursiveConvertFromObjectToArray($result);
 		return $result;
 	}
+
+	/* ツイッターAPIから取得したデータをデータベース保存向けに整形する */
+	private function formatForApiData($data){
+		$tweets = array();
+		$hashtags = array();
+		$users = array();
+		$result = array(
+			'Tweet' => &$tweets,
+			'Hashtag' => &$hashtags,
+			'User' => &$users,
+		);
+		$tweetIdCache = array();
+		/* retweetを配列の後ろに追加していくので、foreachじゃなくてforで回す */
+		for($num=0, $len=count($data['statuses']); $num<$len; $num++){
+			$i = &$data['statuses'][$num];
+			/* 既に同じツイートがリストにある場合はパス */
+			if(!in_array($i['id'], $tweetIdCache)){
+				$tweetIdCache[] = $i['id'];
+				/* リツイートは通常のツイートと同じ構造なので、ツイート配列に追加する */
+				if(isset($i['retweeted_status'])){
+					$data['statuses'][] = $i['retweeted_status'];
+					$len = count($data['statuses']);
+				}
+				/* ツイートの重複チェックはループの始めで行なっているので、無条件でプッシュする */
+				$tweets[] = $this->Tweet->format($i);
+				/* ハッシュタグは同じタグでもツイートID毎に保持するので、無条件でプッシュする*/
+				foreach($this->Hashtag->format($i) as $j){
+					$hashtags[] = $j;
+				}
+				/* ユーザーは重複して保存する意義がないので、同じIDは無視する */
+				if(!isset($users[$i['user']['id']])){
+					$users[$i['user']['id']] = $this->User->format($i);
+				}
+			}
+		}
+		return $result;
+	}
+
 }
 
