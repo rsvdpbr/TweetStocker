@@ -3,6 +3,7 @@
 class TweetController extends AppController {
 
 	public $uses = array('Tweet', 'Hashtag', 'User');
+	public $components = array('Transaction');
 
 	private $twitter = null;
 	private $consumer_key = null;
@@ -106,6 +107,41 @@ class TweetController extends AppController {
 			}
 		}
 		return $result;
+	}
+
+	/* ツイッターAPIから取得し整形関数にかけたデータを、データベースに保存する */
+	private function saveForApiData($data){
+		$models = array(
+			'Tweet' => $this->Tweet,
+			'Hashtag' => $this->Hashtag,
+			'User' => $this->User
+		);
+		$this->Transaction->begin(array_values($models));
+		/* トランザクション中に例外が出た場合は、即時ロールバックを行い改めて例外を投げる */
+		/* ただし、save関数の返り値がfalseの場合に意図的に投げる例外は、ロールバックのみを行う */
+		$saveError = "SaveError";
+		try {
+			foreach($models as $name => $model){
+				foreach($data[$name] as $i){
+					if($i['id']){
+						$model->id = $i['id'];
+					}else{
+						$model->create();
+					}
+					if(!$model->save($i)){
+						throw new Exception($saveError);
+					}
+				}
+			}
+			$this->Transaction->commit();
+			return true;
+		} catch (Exception $e) {
+			$this->Transaction->rollback();
+			if($e->getMessage() != $saveError){
+				throw $e;
+			}
+		}
+		return false;
 	}
 
 }
