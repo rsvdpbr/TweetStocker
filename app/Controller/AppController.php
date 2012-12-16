@@ -33,6 +33,7 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
+	public $uses = array('Config');
 	protected $DataHash;
 
 	public function beforeFilter(){

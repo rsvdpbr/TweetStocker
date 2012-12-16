@@ -1,6 +1,7 @@
 <?php
 
 class TweetController extends AppController {
+
 	private $twitter = null;
 	private $consumer_key = null;
 	private $consumer_secret = null;
@@ -21,11 +22,11 @@ class TweetController extends AppController {
 	/* ツイッターAPIにアクセスするためのオブジェクトを必要に応じて初期化する */
 	private function initTwitterOAuth(){
 		if(!$this->twitter){
-			/* 各種キーの設定（後にデータベースに移動かな） */
-			$this->consumer_key = 'd625JmYrfaYwHgh4JwKBEg';
-			$this->consumer_secret = 'WJcBTHH78mtZRbnZQbwVrvRrJFTatsNaeqO6TDVo';
-			$this->access_token = "704377298-qv6PM0NWzrbcaO2mLQg2oC1AMTm2Lhtpg9jcYIkG";
-			$this->access_token_secret = "RZ9Du7Jac0NQJwpEajAy6vJdFORDqWJ0ILNmRRipHIc";
+			/* 各種キーの取得 */
+			$this->consumer_key = $this->Config->getByKey('consumer-key');
+			$this->consumer_secret = $this->Config->getByKey('consumer-secret');
+			$this->access_token = $this->Config->getByKey('access-token');
+			$this->access_token_secret = $this->Config->getByKey('access-token-secret');
 			/* TwitterOAuthオブジェクトの生成 */
 			App::import('Vendor', 'TwitterOAuth', array('file'=>'TwitterOAuth/twitteroauth.php'));
 			$this->twitter = new TwitterOAuth(
