@@ -39,8 +39,11 @@ class AppController extends Controller {
 		$this->DataHash = array();
 		$this->setDefaultHeaderMenu();
 		$this->setDefaultFooterMenu();
+		$this->request->data = $this->recursiveStripNullByte($this->request->data);
+		$this->request->params['named'] = $this->recursiveStripNullByte($this->request->params['named']);
 	}
 	public function beforeRender(){
+		$this->DataHash = $this->recursiveSanitize($this->DataHash);
 		$this->set('DataHash', $this->DataHash);
 	}
 
@@ -52,5 +55,32 @@ class AppController extends Controller {
 			'トップに戻る' => '#header',
 			'ログアウト' => '/logout',
 		);
+	}
+
+	/* セキュリティ対策関数 */
+	private function recursiveSanitize($arr){
+		if(is_array($arr)){
+			foreach($arr as $key => $value){
+				$arr[$key] = $this->recursiveSanitize($value);
+			}
+		}else{
+			if(!is_object($arr)){
+				$arr = htmlspecialchars($arr, ENT_QUOTES, 'utf-8');
+			}
+		}
+		return $arr;
+	}
+
+	private function recursiveStripNullByte($arr){
+		if(is_array($arr)){
+			foreach($arr as $key => $value){
+				$arr[$key] = $this->recursiveStripNullByte($value);
+			}
+		}else{
+			if(!is_object($arr)){
+				$arr = str_replace("\0", '', $arr);
+			}
+		}
+		return $arr;
 	}
 }
