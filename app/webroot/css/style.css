@@ -1,0 +1,463 @@
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/*
+	General Style
+*/
+html {
+	width: 100%;
+	height: 100%;
+}
+body {
+	width: 100%;
+	height: 100%;
+	background: #3b3b3b;
+	color: #eee;
+	font-family: 'lucida grande',verdana,helvetica,arial,sans-serif;
+	font-size: 90%;
+	margin: 0;
+}
+a {
+	color: #003d4c;
+	text-decoration: none;
+	font-weight: bold;
+}
+a:hover {
+	color: #367889;
+	text-decoration: underline;
+}
+p {
+	margin:1px 0;
+}
+h1, h2, h3, h4 {
+	font-size: 100%;
+	margin-bottom: 1em;
+}
+
+ul {
+	list-style-position: inside;
+	padding-left: 12px;
+}
+
+/*
+	Layout Style
+*/
+#container {
+	height: 100%;
+	text-align: left;
+}
+#header {
+	border-bottom: 1px solid #bbb;
+	height: 50px;
+	line-height: 50px;
+	text-align:left;
+	font-size: 110%;
+	letter-spacing: 1px;
+	padding: 0 30px;
+}
+#header_menu {
+	float:right;
+	font-size: 80%;
+}
+#header_border {
+	background: #f0f0f0;
+	height: 20px;
+}
+#wrapper {
+	background: #f0f0f0;
+}
+#content {
+	color: #111;
+	margin: 0 10px;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #bbb;
+}
+#footer_border {
+	background: #f0f0f0;
+	height: 20px;
+}
+#footer {
+	padding: 8px 18px;
+	text-align: right;
+	border-top: 1px solid #bbb;
+	font-size: 90%;
+}
+#header a, #footer a {
+	color: #eee;
+	font-weight: normal;
+}
+#header a:hover, #footer a:hover {
+	color: #eee;
+}
+#debugOpenButton {
+	color: #555;
+	position: fixed;
+	width: 120px;
+	height: 16px;
+	line-height: 16px;
+	padding: 4px;
+	background: #E5E5FF;
+	border: 1px solid #888;
+	border-top: 0;
+	font-size: 80%;
+	top: 0;
+	right: 140px;
+	z-index: 5;
+	opacity: 0.3;
+	text-align: center;
+}
+#debugOpenButton:hover {
+	font-weight: bold;
+	opacity: 1;
+	cursor: pointer;
+}
+#debug {
+	color: #fff;
+	width: 99%;
+	background: #003d4c;
+	padding: 8px;
+	margin-top:50px;
+	display: none;
+}
+
+/*
+	Page Style
+*/
+h1 {
+	height: 24px;
+	line-height: 24px;
+	font-size: 120%;
+	/* color: #e32; */
+	color: #555;
+	padding: 4px 16px;
+	border: 0 solid #888;
+	border-left: 8px;
+	border-bottom: 1px;
+}
+h2 {
+	width: 95%;
+	height: 20px;
+	line-height: 20px;
+	font-size: 110%;
+	color: #555;
+	padding: 4px 12px;
+	border: 0 solid #888;
+	border-left: 4px;
+	border-bottom: 1px;
+}
+/*
+	CakePHP Style
+*/
+/** Tables **/
+
+table {
+	background: #fff;
+	border-right:0;
+	clear: both;
+	color: #333;
+	margin-bottom: 10px;
+	width: 100%;
+}
+th {
+	border:0;
+	border-bottom:2px solid #555;
+	text-align: left;
+	padding:4px;
+}
+th a {
+	display: block;
+	padding: 2px 4px;
+	text-decoration: none;
+}
+th a.asc:after {
+	content: ' ?';
+}
+th a.desc:after {
+	content: ' ?';
+}
+/*
+table tr td {
+	background: #fff;
+	padding: 6px;
+	text-align: left;
+	vertical-align: top;
+	border-bottom:1px solid #ddd;
+}
+table tr:nth-child(2n) td {
+	background: #f5f5f5;
+}
+*/
+table .altrow td {
+	background: #f5f5f5;
+}
+td.actions {
+	text-align: center;
+	white-space: nowrap;
+}
+table td.actions a {
+	margin: 0px 6px;
+	padding:2px 5px;
+}
+.cake-sql-log table {
+	background: #f4f4f4;
+}
+.cake-sql-log td {
+	padding: 4px 8px;
+	text-align: left;
+	font-family: Monaco, Consolas, "Courier New", monospaced;
+}
+.cake-sql-log caption {
+	color:#fff;
+}
+
+/** Notices and Errors **/
+
+div.message {
+	clear: both;
+	color: #fff;
+	font-size: 140%;
+	font-weight: bold;
+	margin: 0 0 1em 0;
+	background: #c73e14;
+	padding: 5px;
+}
+div.error-message {
+	clear: both;
+	color: #fff;
+	font-weight: bold;
+	background: #c73e14;
+}
+p.error {
+	background-color: #e32;
+	color: #fff;
+	font-family: Courier, monospace;
+	font-size: 120%;
+	line-height: 140%;
+	padding: 0.8em;
+	margin: 1em 0;
+}
+p.error em {
+	color: #000;
+	font-weight: normal;
+	line-height: 140%;
+}
+.notice {
+	background: #ffcc00;
+	color: #000;
+	display: block;
+	font-family: Courier, monospace;
+	font-size: 120%;
+	line-height: 140%;
+	padding: 0.8em;
+	margin: 1em 0;
+}
+.success {
+	background: green;
+	color: #fff;
+}
+
+/** Debugging **/
+pre {
+	color: #000;
+	background: #f0f0f0;
+	padding: 1em;
+}
+pre.cake-debug {
+	background: #ffcc00;
+	font-size: 120%;
+	line-height: 140%;
+	margin-top: 1em;
+	overflow: auto;
+	position: relative;
+}
+div.cake-stack-trace {
+	background: #fff;
+	color: #333;
+	margin: 0px;
+	padding: 6px;
+	font-size: 120%;
+	line-height: 140%;
+	overflow: auto;
+	position: relative;
+}
+div.cake-code-dump pre {
+	position: relative;
+	overflow: auto;
+}
+div.cake-stack-trace pre, div.cake-code-dump pre {
+	color: #000;
+	background-color: #F0F0F0;
+	margin: 0px;
+	padding: 1em;
+	overflow: auto;
+}
+div.cake-code-dump pre, div.cake-code-dump pre code {
+	clear: both;
+	font-size: 12px;
+	line-height: 15px;
+	margin: 4px 2px;
+	padding: 4px;
+	overflow: auto;
+}
+div.cake-code-dump span.code-highlight {
+	background-color: #ff0;
+	padding: 4px;
+}
+div.code-coverage-results div.code-line {
+	padding-left:5px;
+	display:block;
+	margin-left:10px;
+}
+div.code-coverage-results div.uncovered span.content {
+	background:#ecc;
+}
+div.code-coverage-results div.covered span.content {
+	background:#cec;
+}
+div.code-coverage-results div.ignored span.content {
+	color:#aaa;
+}
+div.code-coverage-results span.line-num {
+	color:#666;
+	display:block;
+	float:left;
+	width:20px;
+	text-align:right;
+	margin-right:5px;
+}
+div.code-coverage-results span.line-num strong {
+	color:#666;
+}
+div.code-coverage-results div.start {
+	border:1px solid #aaa;
+	border-width:1px 1px 0px 1px;
+	margin-top:30px;
+	padding-top:5px;
+}
+div.code-coverage-results div.end {
+	border:1px solid #aaa;
+	border-width:0px 1px 1px 1px;
+	margin-bottom:30px;
+	padding-bottom:5px;
+}
+div.code-coverage-results div.realstart {
+	margin-top:0px;
+}
+div.code-coverage-results p.note {
+	color:#bbb;
+	padding:5px;
+	margin:5px 0 10px;
+	font-size:10px;
+}
+div.code-coverage-results span.result-bad {
+	color: #a00;
+}
+div.code-coverage-results span.result-ok {
+	color: #fa0;
+}
+div.code-coverage-results span.result-good {
+	color: #0a0;
+}
+
+/** Elements **/
+#url-rewriting-warning {
+	display: none;
+}
+
+/*
+	Table Style
+*/
+table.list,
+table.detail {
+	width: 100%;
+	margin: 0;
+	border: 1px solid #888;
+	border-collapse: collapse;
+	font-size: 80%;
+}
+table.list th,
+table.detail th {
+	padding: 4px;
+	border: 1px solid #888;
+	background: #F5F5F5;
+	font-weight: bold;
+	text-align: center;
+}
+table.list th {
+	border-bottom: 3px double #888;
+}
+table.detail th{
+	width: 30%;
+}
+table.detail th.top {
+	background: #DADADA;
+}
+table.list td,
+table.detail td {
+	padding: 5px;
+	border: 1px solid #888;
+	background: #FFF;
+	ul {
+		padding: 4px;
+		margin: 0;
+	}
+}
+table.list tr:nth-child(odd) td {
+	background: #F1F1FF;
+}
+
+table.form {
+	width: 98%;
+	margin: 0;
+	/*border: 1px solid #ccc;
+	border-collapse: collapse;*/
+	font-size: 80%;
+}
+table.form td,
+table.form th {
+	padding: 4px 4px;
+	border: 1px solid #888;
+}
+table.form th {
+	width: 260px;
+	background: #fafaff;
+	font-weight: bold;
+	padding: 4px 16px;
+	border-right-width: 6px;
+}
+table.form th.top {
+	font-size: 120%;
+	text-indent: 20px;
+	background: #fff;
+	border-width: 0;
+	padding-top: 8px;
+	border-bottom: 3px double #555;
+}
+/*
+table.form thead.error th.top {
+	color: #C73E14;
+}
+*/
+table.form td {
+	background: #FFF;
+	padding: 4px;
+}
+table.form tr:hover td.form {
+	background: $backcolor + 14;
+}
+table.form tr.line {
+	height: 6px;
+	border-width: 0;
+}
+table.form input[type=text] {
+	width: 99%;
+	margin: 0 0;
+}
+table.form textarea {
+	width: 99%;
+}
+

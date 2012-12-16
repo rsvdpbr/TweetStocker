@@ -37,8 +37,20 @@ class AppController extends Controller {
 
 	public function beforeFilter(){
 		$this->DataHash = array();
+		$this->setDefaultHeaderMenu();
+		$this->setDefaultFooterMenu();
 	}
 	public function beforeRender(){
 		$this->set('DataHash', $this->DataHash);
+	}
+
+	private function setDefaultFooterMenu(){
+		$this->DataHash['header'] = array();
+	}
+	private function setDefaultHeaderMenu(){
+		$this->DataHash['footer'] = array(
+			'トップに戻る' => '#header',
+			'ログアウト' => '/logout',
+		);
 	}
 }
