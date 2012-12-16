@@ -72,6 +72,35 @@ class TweetController extends AppController {
 		return $result;
 	}
 
+	/* ツイッターAPIから取得したデータの中から、既にデータベースに存在するものを削除し、 */
+	/* 削除したidを配列にして返す。引数に与えたデータには副作用がある */
+	private function checkDuplicationForApiData(&$data){
+		/* 取得データから一番最初と一番最後の日時を取得 */
+		$timestamp = array();
+		foreach($data['statuses'] as $i){
+			$timestamp[] = strtotime($i['created_at']);
+		}
+		$start = date('Y-m-d H:i:s', min($timestamp));
+		$end = date('Y-m-d H:i:s', max($timestamp));
+		/* 取得したデータの期間に属するデータベース上のデータのID一覧を取得 */
+		$query = array('fields' => array('id'));
+		$idList = $this->Tweet->getByPeriod($start, $end, $query);
+		foreach($idList as $key => $value){
+			$idList[$key] = $value['Tweet']['id'];
+		}
+		/* 既にデータベースに存在するIDのツイートを取得したデータから削除 */
+		$result = array();
+		foreach($data['statuses'] as $key => $value){
+			if(in_array($value['id'], $idList)){
+				unset($data['statuses'][$key]);
+				$result[] = $value['id'];
+			}
+		}
+		/* 削除によって添字がとんでいる可能性があるので、添字を振り直す */
+		$data['statuses'] = array_merge($data['statuses']);
+		return $result;
+	}
+
 	/* ツイッターAPIから取得したデータをデータベース保存向けに整形する */
 	private function formatForApiData($data){
 		$tweets = array();
