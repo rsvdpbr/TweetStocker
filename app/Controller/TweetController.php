@@ -1,7 +1,6 @@
 <?php
 
 class TweetController extends AppController {
-
 	private $twitter = null;
 	private $consumer_key = null;
 	private $consumer_secret = null;
@@ -67,6 +66,5 @@ class TweetController extends AppController {
 		$result = $this->recursiveConvertFromObjectToArray($result);
 		return $result;
 	}
-
 }
 
