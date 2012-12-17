@@ -26,8 +26,9 @@
  * to use (in this case, /app/View/Pages/home.ctp)...
  */
 	Router::connect('/', array('controller' => 'tweet', 'action' => 'index'));
-	Router::connect('/login', array('controller' => 'user', 'action' => 'login'));
-	Router::connect('/logout', array('controller' => 'user', 'action' => 'logout'));
+	Router::connect('/login', array('controller' => 'member', 'action' => 'login'));
+	Router::connect('/logout', array('controller' => 'member', 'action' => 'logout'));
+	Router::connect('/register', array('controller' => 'member', 'action' => 'register'));
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */

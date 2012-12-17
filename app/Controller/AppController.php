@@ -34,10 +34,12 @@ App::uses('Controller', 'Controller');
 class AppController extends Controller {
 
 	public $uses = array('Config');
+	public $components = array('Auth', 'Session');
 	protected $DataHash;
 
 	public function beforeFilter(){
 		$this->DataHash = array();
+		$this->configureAuthComponent();
 		$this->setDefaultHeaderMenu();
 		$this->setDefaultFooterMenu();
 		$this->request->data = $this->recursiveStripNullByte($this->request->data);
@@ -48,14 +50,30 @@ class AppController extends Controller {
 		$this->set('DataHash', $this->DataHash);
 	}
 
+	/* AuthComponent周りの設定 */
+	private function configureAuthComponent(){
+		$this->Auth->authenticate = array('Form' => array('userModel' => 'Member'));
+		$this->Auth->loginAction = '/login';
+		$this->Auth->loginRedirect = '/';
+		$this->Auth->logoutRedirect = '/login';
+		$this->Auth->authError = "ユーザー認証が必要です。";
+		$this->DataHash['user'] = $this->Auth->user();
+		if(!$this->DataHash['user']) $this->DataHash['user'] = array();
+	}
+
+	/* ヘッダー・フッター用データ初期化 */
 	private function setDefaultFooterMenu(){
 		$this->DataHash['header'] = array();
+		if($this->DataHash['user']){
+			$this->DataHash['header']['ログアウト'] = '/logout';
+		}else{
+			$this->DataHash['header']['ログイン'] = '/login';
+			$this->DataHash['header']['ユーザー登録'] = '/register';
+		}
 	}
 	private function setDefaultHeaderMenu(){
-		$this->DataHash['footer'] = array(
-			'トップに戻る' => '#header',
-			'ログアウト' => '/logout',
-		);
+		$this->DataHash['footer'] = array();
+		$this->DataHash['footer']['トップに戻る'] = '#header';
 	}
 
 	/* セキュリティ対策関数 */
@@ -71,7 +89,6 @@ class AppController extends Controller {
 		}
 		return $arr;
 	}
-
 	private function recursiveStripNullByte($arr){
 		if(is_array($arr)){
 			foreach($arr as $key => $value){
@@ -84,4 +101,5 @@ class AppController extends Controller {
 		}
 		return $arr;
 	}
+	
 }
