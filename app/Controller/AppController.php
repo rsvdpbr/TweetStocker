@@ -57,14 +57,14 @@ class AppController extends Controller {
 		$this->Auth->loginRedirect = '/';
 		$this->Auth->logoutRedirect = '/login';
 		$this->Auth->authError = "ユーザー認証が必要です。";
-		$this->DataHash['user'] = $this->Auth->user();
-		if(!$this->DataHash['user']) $this->DataHash['user'] = array();
+		$this->DataHash['member'] = $this->Auth->user();
+		if(!$this->DataHash['member']) $this->DataHash['member'] = array();
 	}
 
 	/* ヘッダー・フッター用データ初期化 */
 	private function setDefaultFooterMenu(){
 		$this->DataHash['header'] = array();
-		if($this->DataHash['user']){
+		if($this->DataHash['member']){
 			$this->DataHash['header']['ログアウト'] = '/logout';
 		}else{
 			$this->DataHash['header']['ログイン'] = '/login';
