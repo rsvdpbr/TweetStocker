@@ -69,6 +69,7 @@ class TweetController extends AppController {
 		$result = $this->twitter->OAuthRequest($url, 'GET', $obj);
 		$result = json_decode($result);
 		$result = $this->recursiveConvertFromObjectToArray($result);
+		if(!$result) throw new Exception("could not fetch tweet data with twitter api");
 		return $result;
 	}
 
