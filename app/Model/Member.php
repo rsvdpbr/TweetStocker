@@ -7,6 +7,10 @@ class Member extends AppModel {
 			'className' => 'Keyword',
 			'foreignKey' => 'member_id',
 		),
+		'MemberKeyword' => array(
+			'className' => 'MemberKeyword',
+			'foreignKey' => 'member_id',
+		)
 	);
 	public $validate = array(
 		'username' => array(

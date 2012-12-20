@@ -2,6 +2,13 @@
 
 class Tweet extends AppModel {
 
+	public $hasMany = array(
+		'KeywordTweet' => array(
+			'className' => 'KeywordTweet',
+			'foreignKey' => 'tweet_id',
+		),
+	);
+
 	/* 一件のツイートデータ全体を渡すと、Tweetモデルの構造に合わせた配列を作る */
 	public function format(&$data){
 		if(isset($data['retweeted_status'])){

@@ -2,7 +2,7 @@
 
 class TweetController extends AppController {
 
-	public $uses = array('Tweet', 'Hashtag', 'User');
+	public $uses = array('Tweet', 'Hashtag', 'User', 'KeywordTweet', 'MemberKeyword');
 	public $components = array('Transaction');
 
 	private $twitter = null;
@@ -51,8 +51,22 @@ class TweetController extends AppController {
 		return $arr;
 	}
 
-	/* ツイッターAPIを用いて、キーワードで検索を行う */
-	private function twitterSearch($param){
+	/* キーワードIDを渡すと、そのキーワードで検索した結果を返す */
+	private function twitterSearchByKeyword($keywordId, $query = array()){
+		/* ログイン中のメンバーIDで、この与えられたキーワードIDにアクセス出来るかを確認 */
+		$memberId = $this->DataHash['member']['id'];
+		$keyword = $this->MemberKeyword->checkAuthentication($memberId, $keywordId);
+		if(!$keyword) throw new Exception("authentication failure");
+		/* クエリを組み立て、ツイッターAPIでキーワード検索する関数を呼び出し */
+		$query['q'] = $keyword['keyword'];
+		$result = $this->_twitterSearch($query);
+		$result['keyword'] = $keyword;
+		return $result;
+	}
+
+	/* ツイッターAPIを用いて、キーワードで検索を行う
+	   基本的に、twitterSearchByKeywordから呼び出し、直接は呼び出さない */
+	private function _twitterSearch($param){
 		/* 各項目の設定 */
 		if(!isset($param['q'])){
 			throw new InvalidArgumentException('the first argument must have q(uery) key');
@@ -99,7 +113,7 @@ class TweetController extends AppController {
 		}
 		/* 削除によって添字がとんでいる可能性があるので、添字を振り直す */
 		$data['statuses'] = array_merge($data['statuses']);
-		return $result;
+		$data['duplicateId'] = $result;
 	}
 
 	/* ツイッターAPIから取得したデータをデータベース保存向けに整形する */
@@ -107,10 +121,12 @@ class TweetController extends AppController {
 		$tweets = array();
 		$hashtags = array();
 		$users = array();
+		$keywordTweets = array();
 		$result = array(
 			'Tweet' => &$tweets,
 			'Hashtag' => &$hashtags,
 			'User' => &$users,
+			'KeywordTweet' => &$keywordTweets,
 		);
 		$tweetIdCache = array();
 		/* retweetを配列の後ろに追加していくので、foreachじゃなくてforで回す */
@@ -134,7 +150,23 @@ class TweetController extends AppController {
 				if(!isset($users[$i['user']['id']])){
 					$users[$i['user']['id']] = $this->User->format($i);
 				}
+				/* ツイートとキーワードの関連付けを行う */
+				$keywordTweets[] = array(
+					'keyword_id' => $data['keyword']['id'],
+					'tweet_id' => $i['id'],
+				);
 			}
+		}
+		/* 既にデータベースに存在するツイート（duplicateId）の中から現在のキーワードと
+		   関連付けられていない場合は、現在のキーワードと関連付ける */
+		$idList = $this->KeywordTweet->getByTweetIdsAndOtherKeywordId(
+			$data['duplicateId'], $data['keyword']['id']
+		);
+		foreach($idList as $did){
+			$keywordTweets[] = array(
+				'keyword_id' => $data['keyword']['id'],
+				'tweet_id' => $did,
+			);
 		}
 		return $result;
 	}
@@ -144,7 +176,8 @@ class TweetController extends AppController {
 		$models = array(
 			'Tweet' => $this->Tweet,
 			'Hashtag' => $this->Hashtag,
-			'User' => $this->User
+			'User' => $this->User,
+			'KeywordTweet' => $this->KeywordTweet,
 		);
 		$this->Transaction->begin(array_values($models));
 		/* トランザクション中に例外が出た場合は、即時ロールバックを行い改めて例外を投げる */
@@ -153,7 +186,7 @@ class TweetController extends AppController {
 		try {
 			foreach($models as $name => $model){
 				foreach($data[$name] as $i){
-					if($i['id']){
+					if(isset($i['id']) && $i['id']){
 						$model->id = $i['id'];
 					}else{
 						$model->create();
