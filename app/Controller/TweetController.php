@@ -137,7 +137,7 @@ class TweetController extends AppController {
 				$tweetIdCache[] = $i['id'];
 				/* リツイートは通常のツイートと同じ構造なので、ツイート配列に追加する */
 				if(isset($i['retweeted_status']) &&
-					!in_array($data['retweeted_status']['id'], $data['duplicateId'])){
+					!in_array($i['retweeted_status']['id'], $data['duplicateId'])){
 					$data['statuses'][] = $i['retweeted_status'];
 					$len = count($data['statuses']);
 				}
