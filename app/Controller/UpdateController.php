@@ -3,30 +3,49 @@
 class UpdateController extends AppController {
 
 	public $uses = array('Tweet', 'Hashtag', 'User', 'Keyword', 'KeywordTweet', 'MemberKeyword');
-	public $components = array('Transaction');
+	public $components = array('Transaction', 'RequestHandler');
 
+	private $Response;
 	private $twitter = null;
-	private $consumer_key = null;
-	private $consumer_secret = null;
-	private $access_token = null;
-	private $access_token_secret = null;
 
-	public function index($id = null){
+	/* $this->response()を呼び出すと、$this->Resultの中身をjson形式で返す */
+	public function beforeFilter(){
+		parent::beforeFilter();
+		$this->Result = array();
+	}
+	private function response(){
+		return new CakeResponse(array('body' => json_encode($this->Result)));
+	}
+
+	/* キーワード別ツイート取得処理の入り口（json） */
+	public function keyword($id = null){
+		if(!$id) throw new Exception("argument error");
+		$data = $this->twitterSearchByKeyword($id);
+		$this->checkDuplicationForApiData($data);
+		$result = $this->formatForApiData($data);
+		$this->Result['result'] = $this->saveForApiData($result);
+		$count = array();
+		foreach($result as $key => $val){
+			$count[$key] = count($val);
+		}
+		$this->Result['keyword'] = $data['keyword'];
+		$this->Result['count'] = $count;
+		return $this->response();
 	}
 
 	/* ツイッターAPIにアクセスするためのオブジェクトを必要に応じて初期化する */
 	private function initTwitterOAuth(){
 		if(!$this->twitter){
 			/* 各種キーの取得 */
-			$this->consumer_key = $this->Config->getByKey('consumer-key');
-			$this->consumer_secret = $this->Config->getByKey('consumer-secret');
-			$this->access_token = $this->Config->getByKey('access-token');
-			$this->access_token_secret = $this->Config->getByKey('access-token-secret');
+			$consumer_key = $this->Config->getByKey('consumer-key');
+			$consumer_secret = $this->Config->getByKey('consumer-secret');
+			$access_token = $this->Config->getByKey('access-token');
+			$access_token_secret = $this->Config->getByKey('access-token-secret');
 			/* TwitterOAuthオブジェクトの生成 */
 			App::import('Vendor', 'TwitterOAuth', array('file'=>'TwitterOAuth/twitteroauth.php'));
 			$this->twitter = new TwitterOAuth(
-				$this->consumer_key, $this->consumer_secret,
-				$this->access_token, $this->access_token_secret
+				$consumer_key, $consumer_secret,
+				$access_token, $access_token_secret
 			);
 		}
 	}

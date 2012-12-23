@@ -30,7 +30,7 @@
 	Router::connect('/login', array('controller' => 'member', 'action' => 'login'));
 	Router::connect('/logout', array('controller' => 'member', 'action' => 'logout'));
 	Router::connect('/register', array('controller' => 'member', 'action' => 'register'));
-	Router::connect('/update/*', array('controller' => 'update', 'action' => 'index'));
+	Router::connect('/update/keyword/*', array('controller' => 'update', 'action' => 'keyword'));
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
@@ -41,6 +41,11 @@
  * how to customize the loading of plugin routes.
  */
 	CakePlugin::routes();
+
+/**
+ * parse extensions
+ */
+	Router::parseExtensions('json');
 
 /**
  * Load the CakePHP default routes. Only remove this if you do not want to use
