@@ -15,6 +15,7 @@ class KeywordTweet extends AppModel {
 	
 	/* キーワードIDは違うがツイートIDが一致するデータを取得 */
 	public function getByTweetIdsAndOtherKeywordId($tids, $kid){
+		/* キーワードIDが異なるものを取得 */
 		$data = $this->find('all', array(
 				'conditions' => array(
 					'tweet_id' => $tids,
@@ -28,6 +29,20 @@ class KeywordTweet extends AppModel {
 		foreach($data as $i){
 			$result[] = $i['KeywordTweet']['tweet_id'];
 		}
+		/* キーワードIDが同じ物を取得して、結果から取り除く */
+		$data = $this->find('all', array(
+				'conditions' => array(
+					'tweet_id' => $tids,
+					'keyword_id' => $kid,
+				),
+				'recursive' => -1,
+			));
+		$diff = array();
+		foreach($data as $i){
+			$diff[] = $i['KeywordTweet']['tweet_id'];
+		}
+		$result = array_diff($result, $diff);
+		$result = array_merge($result);
 		return $result;
 	}
 
