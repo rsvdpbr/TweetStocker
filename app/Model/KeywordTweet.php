@@ -13,7 +13,7 @@ class KeywordTweet extends AppModel {
 		),
 	);
 	
-	/*  */
+	/* キーワードIDは違うがツイートIDが一致するデータを取得 */
 	public function getByTweetIdsAndOtherKeywordId($tids, $kid){
 		$data = $this->find('all', array(
 				'conditions' => array(
@@ -27,6 +27,21 @@ class KeywordTweet extends AppModel {
 		$result = array();
 		foreach($data as $i){
 			$result[] = $i['KeywordTweet']['tweet_id'];
+		}
+		return $result;
+	}
+
+	/* キーワード毎のツイート数を取得 */
+	public function getCountByKeyword($kid){
+		$data = $this->find('all', array(
+				'fields' => array('keyword_id', 'count(*) AS count'),
+				'conditions' => array('keyword_id' => $kid),
+				'group' => array('keyword_id'),
+				'recursive' => -1,
+			));
+		$result = array();
+		foreach($data as $i){
+			$result[$i['KeywordTweet']['keyword_id']] = $i[0]['count'];
 		}
 		return $result;
 	}

@@ -65,6 +65,8 @@ class AppController extends Controller {
 	private function setDefaultFooterMenu(){
 		$this->DataHash['header'] = array();
 		if($this->DataHash['member']){
+			$this->DataHash['header']['ツイート'] = '/';
+			$this->DataHash['header']['キーワード'] = '/keyword';
 			$this->DataHash['header']['ログアウト'] = '/logout';
 		}else{
 			$this->DataHash['header']['ログイン'] = '/login';

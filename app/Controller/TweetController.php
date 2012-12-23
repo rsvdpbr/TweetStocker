@@ -2,7 +2,7 @@
 
 class TweetController extends AppController {
 
-	public $uses = array('Tweet', 'Hashtag', 'User', 'KeywordTweet', 'MemberKeyword');
+	public $uses = array('Tweet', 'Hashtag', 'User', 'Keyword', 'KeywordTweet', 'MemberKeyword');
 	public $components = array('Transaction');
 
 	private $twitter = null;
@@ -125,11 +125,13 @@ class TweetController extends AppController {
 		$hashtags = array();
 		$users = array();
 		$keywordTweets = array();
+		$keywords = array();
 		$result = array(
 			'Tweet' => &$tweets,
 			'Hashtag' => &$hashtags,
 			'User' => &$users,
 			'KeywordTweet' => &$keywordTweets,
+			'Keyword' => &$keywords,
 		);
 		$tweetIdCache = array();
 		/* retweetを配列の後ろに追加していくので、foreachじゃなくてforで回す */
@@ -172,6 +174,11 @@ class TweetController extends AppController {
 				'tweet_id' => $did,
 			);
 		}
+		/* Keywordモデルのlast_updateを更新 */
+		$keywords[] = array(
+			'id' => $data['keyword']['id'],
+			'last_update' => date('Y-m-d H:i:s'),
+		);
 		return $result;
 	}
 
@@ -182,6 +189,7 @@ class TweetController extends AppController {
 			'Hashtag' => $this->Hashtag,
 			'User' => $this->User,
 			'KeywordTweet' => $this->KeywordTweet,
+			'Keyword' => $this->Keyword,
 		);
 		$this->Transaction->begin(array_values($models));
 		/* トランザクション中に例外が出た場合は、即時ロールバックを行い改めて例外を投げる */

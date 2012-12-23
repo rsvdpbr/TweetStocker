@@ -13,18 +13,17 @@ class MemberKeyword extends AppModel {
 		),
 	);
 
-	/* 渡されたMeberIDに関連付けられているキーワードを[id=>keyword]の配列にして返す */
+	/* 渡されたMeberIDに関連付けられているキーワードを返す */
 	public function getByMemberId($memberId){
 		$this->unbindModel(array('belongsTo' => array('Member')));
 		$data = $this->find('all', array(
-				'fields' => array('Keyword.id', 'Keyword.keyword'),
 				'conditions' => array(
 					'MemberKeyword.member_id' => $memberId,
 				),
 			));
 		$result = array();
 		foreach($data as $i){
-			$result[$i['Keyword']['id']] = $i['Keyword']['keyword'];
+			$result[$i['Keyword']['id']] = $i['Keyword'];
 		}
 		return $result;
 	}
@@ -33,7 +32,6 @@ class MemberKeyword extends AppModel {
 	public function checkAuthentication($memberId, $keywordId){
 		$this->unbindModel(array('belongsTo' => array('Member')));
 		$data = $this->find('first', array(
-				'fields' => array('Keyword.id', 'Keyword.keyword'),
 				'conditions' => array(
 					'MemberKeyword.member_id' => $memberId,
 					'MemberKeyword.keyword_id' => $keywordId,
