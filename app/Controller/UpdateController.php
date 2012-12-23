@@ -6,12 +6,15 @@ class UpdateController extends AppController {
 	public $components = array('Transaction', 'RequestHandler');
 
 	private $Response;
+	private $noAuthentication;
 	private $twitter = null;
 
 	/* $this->response()を呼び出すと、$this->Resultの中身をjson形式で返す */
 	public function beforeFilter(){
 		parent::beforeFilter();
 		$this->Result = array();
+		$this->Auth->allow();
+		$this->noAuthentication = false;
 	}
 	private function response(){
 		return new CakeResponse(array('body' => json_encode($this->Result)));
@@ -19,18 +22,36 @@ class UpdateController extends AppController {
 
 	/* キーワード別ツイート取得処理の入り口（json） */
 	public function keyword($id = null){
-		if(!$id) throw new Exception("argument error");
+		if($id == null){
+			$this->noAuthentication = true;
+			/* 各キーワードをローテーションして、取得する */
+			$limit = $this->Config->getByKey('update-number-of-keywords');
+			$keywords = $this->Keyword->getOrderByLastUpdate($limit);
+			$result = array();
+			foreach($keywords as $i){
+				$result[] = $this->keywordById($i['id']);
+				set_time_limit(30); /* タイムアウトを残り30秒にセット */
+			}
+			$this->Result = $result;
+		}else{
+			/* 渡されたキーワードIDで取得 */
+			$this->Result = $this->keywordById($id);
+		}
+		return $this->response();
+	}
+	private function keywordById($id){
+		$ret = array();
 		$data = $this->twitterSearchByKeyword($id);
 		$this->checkDuplicationForApiData($data);
 		$result = $this->formatForApiData($data);
-		$this->Result['result'] = $this->saveForApiData($result);
+		$ret['result'] = $this->saveForApiData($result);
 		$count = array();
 		foreach($result as $key => $val){
 			$count[$key] = count($val);
 		}
-		$this->Result['keyword'] = $data['keyword'];
-		$this->Result['count'] = $count;
-		return $this->response();
+		$ret['keyword'] = $data['keyword'];
+		$ret['count'] = $count;
+		return $ret;
 	}
 
 	/* ツイッターAPIにアクセスするためのオブジェクトを必要に応じて初期化する */
@@ -52,10 +73,16 @@ class UpdateController extends AppController {
 
 	/* キーワードIDを渡すと、そのキーワードで検索した結果を返す */
 	private function twitterSearchByKeyword($keywordId, $query = array()){
-		/* ログイン中のメンバーIDで、この与えられたキーワードIDにアクセス出来るかを確認 */
-		$memberId = $this->DataHash['member']['id'];
-		$keyword = $this->MemberKeyword->checkAuthentication($memberId, $keywordId);
-		if(!$keyword) throw new Exception("authentication failure");
+		if($this->noAuthentication){
+			$keyword = $this->Keyword->findById($keywordId);
+			if(!$keyword) throw new Exception("keyword error");
+			$keyword = $keyword['Keyword'];
+		}else{
+			/* ログイン中のメンバーIDで、この与えられたキーワードIDにアクセス出来るかを確認 */
+			$memberId = $this->DataHash['member']['id'];
+			$keyword = $this->MemberKeyword->checkAuthentication($memberId, $keywordId);
+			if(!$keyword) throw new Exception("authentication failure");
+		}
 		/* クエリを組み立て、ツイッターAPIでキーワード検索する関数を呼び出し */
 		$query['q'] = $keyword['keyword'];
 		$result = $this->_twitterSearch($query);

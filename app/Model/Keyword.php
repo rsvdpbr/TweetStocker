@@ -15,5 +15,18 @@ class Keyword extends AppModel {
 		),
 	);
 
+	public function getOrderByLastUpdate($limit){
+		$data = $this->find('all', array(
+				'order' => array('last_update ASC'),
+				'limit' => $limit,
+				'recursive' => -1,
+			));
+		$result = array();
+		foreach($data as $i){
+			$result[] = $i['Keyword'];
+		}
+		return $result;
+	}
+
 }
 
