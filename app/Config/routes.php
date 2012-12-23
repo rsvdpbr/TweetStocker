@@ -30,6 +30,7 @@
 	Router::connect('/login', array('controller' => 'member', 'action' => 'login'));
 	Router::connect('/logout', array('controller' => 'member', 'action' => 'logout'));
 	Router::connect('/register', array('controller' => 'member', 'action' => 'register'));
+	Router::connect('/update/*', array('controller' => 'update', 'action' => 'index'));
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
