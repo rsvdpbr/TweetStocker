@@ -94,6 +94,9 @@ class TweetController extends AppController {
 		$timestamp = array();
 		foreach($data['statuses'] as $i){
 			$timestamp[] = strtotime($i['created_at']);
+			if(isset($i['retweeted_status']) && isset($i['retweeted_status']['created_at'])){
+				$timestamp[] = strtotime($i['retweeted_status']['created_at']);
+			}
 		}
 		$start = date('Y-m-d H:i:s', min($timestamp));
 		$end = date('Y-m-d H:i:s', max($timestamp));
