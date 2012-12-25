@@ -34,7 +34,8 @@
 		［<?php echo $this->Html->link(' '.$text.' ', $link); ?>］
 		<?php } ?>
 	  </div>
+	  <?php //pr($DataHash); ?>
+	  <?php echo $this->element('sql_dump'); ?>
 	</div>
-	<?php echo $this->element('sql_dump'); ?>
   </body>
 </html>

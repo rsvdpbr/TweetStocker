@@ -60,5 +60,20 @@ class KeywordTweet extends AppModel {
 		}
 		return $result;
 	}
-	
+
+	/* キーワードIDでツイートを取得 */
+	public function getTweetByKeyword($kid){
+		$this->unbindModel(array('belongsTo' => array('Keyword')));
+		$data = $this->find('all', array(
+				'fields' => array('Tweet.*'),
+				'conditions' => array('keyword_id' => $kid),
+				'order' => array('datetime DESC'),
+			));
+		$result = array();
+		foreach($data as $i){
+			$result[] = $i['Tweet'];
+		}
+		return $result;
+	}
+
 }
